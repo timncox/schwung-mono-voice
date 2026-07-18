@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out distribution metadata
+        uses: actions/checkout@v4
+
+      - name: Verify release metadata
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          VERSION="${RELEASE_VERSION#v}"
+          test "$(jq -r '.version' release.json)" = "$VERSION"
+          test "$(jq -r '.download_url' release.json)" = "https://github.com/${GITHUB_REPOSITORY}/releases/download/${RELEASE_VERSION}/mono-voice-module.tar.gz"
+
+      - name: Download canonical Mono Voice build
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          curl -fsSL --retry 3 --retry-all-errors \
+            -o mono-voice-module.tar.gz \
+            "https://github.com/timncox/schwung-mono/releases/download/${RELEASE_VERSION}/mono-voice-module.tar.gz"
+
+      - name: Verify module archive
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          VERSION="${RELEASE_VERSION#v}"
+          gzip -t mono-voice-module.tar.gz
+          test "$(tar -xOzf mono-voice-module.tar.gz mono-voice/module.json | jq -r '.id')" = "mono-voice"
+          test "$(tar -xOzf mono-voice-module.tar.gz mono-voice/module.json | jq -r '.version')" = "$VERSION"
+
+      - name: Publish Mono Voice release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: mono-voice-module.tar.gz
