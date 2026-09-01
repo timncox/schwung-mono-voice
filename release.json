@@ -1,6 +1,6 @@
 {
-  "version": "0.4.2",
-  "download_url": "https://github.com/timncox/schwung-mono/releases/download/v0.4.2/mono-voice-module.tar.gz",
+  "version": "0.4.3",
+  "download_url": "https://github.com/timncox/schwung-mono/releases/download/v0.4.3/mono-voice-module.tar.gz",
   "name": "Mono Voice",
   "description": "Elektron-style digital machine synth voice with SuperWave, SID, DigiPRO, FM, deep modulation, and arp latch",
   "repo_url": "https://github.com/timncox/schwung-mono-voice"
